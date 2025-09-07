@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced AI-powered scientific calculator with natural language processing">
+    <meta name="keywords" content="calculator, scientific calculator, AI calculator, math, mathematics">
+    <meta name="author" content="AI Calculator App">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQUkgU2NpZW50aWZpYyBDYWxjdWxhdG9yIiwic2hvcnRfbmFtZSI6IkFJIENhbGMiLCJkZXNjcmlwdGlvbiI6IkFkdmFuY2VkIEFJLXBvd2VyZWQgc2NpZW50aWZpYyBjYWxjdWxhdG9yIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxZTI5M2IiLCJ0aGVtZV9jb2xvciI6IiM3YzNhZWQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M00zUnZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXlOQ0F5TkNJK1BIQmhkR2dnWkQwaWJURXlJRE5ETTU0ME9DQXpJRElnTmk0ME9DQXpJREV5Y3pRdU5EZ2dNVEFnTVRBZ01UQnpOQzAwT0MxNElEVXVOVElnTWkxTmVUa2dUbUZOZVRrdU1EWWdNVEF1TURJZ05qRWdNVEZtWVdRZ05DNHdNMVpsZVNWMlEyTnNZVzV6TlNJZ1ptbHNiRDBpSXpkaU0yRm1aQ0krUEM5d1lYUm9Qand2YzNabkdnPT0iLCJzaXplcyI6IjE5Mng5NiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0ibTEyIDNDNS40OCAzIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTBzNC00OC0xMFM1LjUyIDItTXktTXkuMDYgMTAuMDIgNjEgMTFmYWQgNC4wM1ZleVYyQ2xZVzV6TlNJZ1ptbHNiRDBpSXpkaU0yRm1aQ0krUEM5d1lYUm9Qand2YzNabkdnPT0iIHR5cGU9ImltYWdlL3N2Zyt4bWwiLz4KICAgIAogICAgPHRpdGxlPkFJIFNjaWVudGlmaWMgQ2FsY3VsYXRvcjwvdGl0bGU+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
+            min-height: 100vh; color: white; padding: 20px;
+        }
+        .calculator-container {
+            max-width: 1200px; margin: 0 auto;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            border-radius: 20px; border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); padding: 30px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; font-weight: bold; }
+        .display-area {
+            background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.3); margin-bottom: 20px;
+        }
+        .expression { font-size: 14px; color: #9ca3af; min-height: 20px; margin-bottom: 5px; }
+        .result { font-size: 2rem; font-family: 'Courier New', monospace; text-align: right; font-weight: bold; }
+        .ai-suggestion {
+            background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none;
+        }
+        .ai-suggestion.show { display: block; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .badge {
+            display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .badge.active { background: #3b82f6; color: white; }
+        .badge.secondary { background: #374151; color: #d1d5db; }
+        .badge.outline { border: 1px solid #4b5563; color: #9ca3af; }
+        .btn {
+            padding: 8px 16px; border: 1px solid #4b5563; background: transparent;
+            color: white; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn:hover { background: #374151; }
+        .calculator-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; }
+        @media (max-width: 1024px) { .calculator-grid { grid-template-columns: 1fr; } }
+        .basic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .scientific-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        @media (min-width: 1024px) { .scientific-grid { grid-template-columns: 1fr; } }
+        .calc-btn {
+            padding: 12px; border: none; border-radius: 8px; color: white;
+            font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 16px;
+        }
+        .calc-btn:hover { transform: translateY(-1px); }
+        .calc-btn.zero { grid-column: span 2; }
+        .calc-btn.number { background: #374151; }
+        .calc-btn.operator { background: #3b82f6; }
+        .calc-btn.clear { background: #ef4444; }
+        .calc-btn.equals { background: #10b981; }
+        .calc-btn.scientific { background: #8b5cf6; font-size: 12px; padding: 8px; }
+        .calc-btn.memory { background: #f59e0b; }
+        .calc-btn.constant { background: #06b6d4; }
+        .side-panel { background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px; height: 280px; }
+        .ai-input { width: 100%; padding: 10px; border: 1px solid #4b5563; background: rgba(0, 0, 0, 0.3); color: white; border-radius: 6px; margin-bottom: 10px; }
+        .ai-calculate-btn { width: 100%; padding: 10px; background: #8b5cf6; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .hidden { display: none; }
+        
+        /* PWA Install Button */
+        .install-prompt {
+            position: fixed; bottom: 20px; right: 20px; 
+            background: linear-gradient(45deg, #8b5cf6, #3b82f6);
+            color: white; border: none; border-radius: 50px;
+            padding: 12px 20px; font-weight: 600;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+            cursor: pointer; transition: all 0.3s;
+            display: none; z-index: 1000;
+        }
+        .install-prompt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        /* Improved Mobile Experience */
+        @media (max-width: 768px) {
+            .calculator-container { padding: 15px; margin: 10px; }
+            .calculator-grid { gap: 15px; }
+            .calc-btn { padding: 15px; font-size: 18px; }
+            .result { font-size: 1.8rem; }
+            .side-panel { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- Install Button for PWA -->
+        <button id="installBtn" class="install-prompt">📱 Install App</button>
+        
+        <div class="header"><h1>🧠 AI Scientific Calculator</h1></div>
+
+        <div class="display-area">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="display">0</div>
+        </div>
+
+        <div class="ai-suggestion" id="aiSuggestion">
+            <div>💡 AI Suggestion: <span id="aiSuggestionText"></span></div>
+        </div>
+
+        <div class="controls">
+            <div>
+                <span class="badge active" id="angleMode" onclick="toggleAngleMode()">RAD</span>
+                <span class="badge outline" id="memoryDisplay">M: 0.00</span>
+            </div>
+            <div>
+                <button class="btn" onclick="toggleHistory()">📜 History</button>
+                <button class="btn" onclick="clearHistory()">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <div class="calculator-grid">
+            <div>
+                <h3>Scientific</h3>
+                <div class="scientific-grid">
+                    <button class="calc-btn scientific" onclick="addFunction('sin')">sin</button>
+                    <button class="calc-btn scientific" onclick="addFunction('cos')">cos</button>
+                    <button class="calc-btn scientific" onclick="addFunction('tan')">tan</button>
+                    <button class="calc-btn scientific" onclick="addFunction('ln')">ln</button>
+                    <button class="calc-btn scientific" onclick="addFunction('log')">log</button>
+                    <button class="calc-btn constant" onclick="addFunction('sqrt')">√</button>
+                    <button class="calc-btn constant" onclick="addOperator('^2')">x²</button>
+                    <button class="calc-btn constant" onclick="addOperator('^')">x^y</button>
+                    <button class="calc-btn constant" onclick="addOperator('π')">π</button>
+                    <button class="calc-btn constant" onclick="addOperator('e')">e</button>
+                    <button class="calc-btn memory" onclick="memoryClear()">MC</button>
+                    <button class="calc-btn memory" onclick="memoryRecall()">MR</button>
+                </div>
+            </div>
+
+            <div>
+                <h3>Basic Operations</h3>
+                <div class="basic-grid">
+                    <button class="calc-btn clear" onclick="clearAll()">C</button>
+                    <button class="calc-btn operator" onclick="plusMinus()">±</button>
+                    <button class="calc-btn operator" onclick="addOperator('%')">%</button>
+                    <button class="calc-btn operator" onclick="addOperator('/')">÷</button>
+                    
+                    <button class="calc-btn number" onclick="addNumber('7')">7</button>
+                    <button class="calc-btn number" onclick="addNumber('8')">8</button>
+                    <button class="calc-btn number" onclick="addNumber('9')">9</button>
+                    <button class="calc-btn operator" onclick="addOperator('*')">×</button>
+                    
+                    <button class="calc-btn number" onclick="addNumber('4')">4</button>
+                    <button class="calc-btn number" onclick="addNumber('5')">5</button>
+                    <button class="calc-btn number" onclick="addNumber('6')">6</button>
+                    <button class="calc-btn operator" onclick="addOperator('-')">−</button>
+                    
+                    <button class="calc-btn number" onclick="addNumber('1')">1</button>
+                    <button class="calc-btn number" onclick="addNumber('2')">2</button>
+                    <button class="calc-btn number" onclick="addNumber('3')">3</button>
+                    <button class="calc-btn operator" onclick="addOperator('+')">+</button>
+                    
+                    <button class="calc-btn number zero" onclick="addNumber('0')">0</button>
+                    <button class="calc-btn number" onclick="addOperator('.')">.</button>
+                    <button class="calc-btn equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+
+            <div class="side-panel">
+                <h3 id="panelTitle">AI Input</h3>
+                <div id="historyPanel" class="hidden"></div>
+                <div id="aiInputPanel">
+                    <input type="text" class="ai-input" id="aiInput" placeholder="Type natural language math..." onkeypress="handleAIEnter(event)">
+                    <button class="ai-calculate-btn" onclick="calculateAI()">✨ Calculate</button>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">
+                        Try: "sin of 30 degrees", "square root of 16"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let display = '0', expression = '', history = [], isRadians = true, memory = 0, showHistory = false;
+        
+        function updateDisplay() {
+            document.getElementById('display').textContent = display;
+            document.getElementById('expression').textContent = expression;
+            document.getElementById('memoryDisplay').textContent = `M: ${memory.toFixed(2)}`;
+        }
+
+        function showAISuggestion(text) {
+            document.getElementById('aiSuggestionText').textContent = text;
+            document.getElementById('aiSuggestion').classList.add('show');
+            setTimeout(() => document.getElementById('aiSuggestion').classList.remove('show'), 5000);
+        }
+
+        function addNumber(num) {
+            expression += num;
+            display = expression;
+            updateDisplay();
+        }
+
+        function addOperator(op) {
+            if (op === 'π') expression += Math.PI;
+            else if (op === 'e') expression += Math.E;
+            else expression += op;
+            display = expression;
+            updateDisplay();
+        }
+
+        function addFunction(func) {
+            expression += func + '(';
+            display = expression;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            display = '0'; expression = '';
+            updateDisplay();
+        }
+
+        function plusMinus() {
+            if (display !== '0') {
+                display = display.startsWith('-') ? display.slice(1) : '-' + display;
+                updateDisplay();
+            }
+        }
+
+        function toggleAngleMode() {
+            isRadians = !isRadians;
+            const elem = document.getElementById('angleMode');
+            elem.textContent = isRadians ? 'RAD' : 'DEG';
+            elem.className = isRadians ? 'badge active' : 'badge secondary';
+        }
+
+        function memoryClear() { memory = 0; updateDisplay(); }
+        function memoryRecall() { display = memory.toString(); expression += memory; updateDisplay(); }
+
+        function evaluateExpression(expr) {
+            let cleanExpr = expr
+                .replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-')
+                .replace(/sin\(/g, `Math.sin(${isRadians ? '' : 'Math.PI/180*'}`)
+                .replace(/cos\(/g, `Math.cos(${isRadians ? '' : 'Math.PI/180*'}`)
+                .replace(/tan\(/g, `Math.tan(${isRadians ? '' : 'Math.PI/180*'}`)
+                .replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(')
+                .replace(/sqrt\(/g, 'Math.sqrt(').replace(/(\d+)\^2/g, 'Math.pow($1,2)');
+            return Function(`"use strict"; return (${cleanExpr})`)();
+        }
+
+        function calculate() {
+            if (!expression) return;
+            try {
+                const result = evaluateExpression(expression);
+                display = result.toString();
+                history.push({ expression, result: display });
+                expression = '';
+                memory = result;
+                updateDisplay();
+                showAISuggestion('✨ Calculation completed!');
+            } catch (error) {
+                display = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function toggleHistory() {
+            showHistory = !showHistory;
+            const historyPanel = document.getElementById('historyPanel');
+            const aiInputPanel = document.getElementById('aiInputPanel');
+            const panelTitle = document.getElementById('panelTitle');
+            
+            if (showHistory) {
+                historyPanel.classList.remove('hidden');
+                aiInputPanel.classList.add('hidden');
+                panelTitle.textContent = 'History';
+                historyPanel.innerHTML = history.length === 0 ? 'No calculations yet' : 
+                    history.slice(-10).reverse().map(item => 
+                        `<div style="margin-bottom: 10px; font-size: 12px;">
+                            <div style="color: #9ca3af;">${item.expression}</div>
+                            <div>= ${item.result}</div>
+                        </div>`
+                    ).join('');
+            } else {
+                historyPanel.classList.add('hidden');
+                aiInputPanel.classList.remove('hidden');
+                panelTitle.textContent = 'AI Input';
+            }
+        }
+
+        function clearHistory() { history = []; }
+
+        function parseNaturalLanguage(input) {
+            const lower = input.toLowerCase();
+            if (lower.includes('sin') && lower.includes('degree')) {
+                const num = lower.match(/(\d+(?:\.\d+)?)/)?.[1];
+                return num ? `sin(${num} * π / 180)` : input;
+            }
+            if (lower.includes('square root')) {
+                const num = lower.match(/(\d+(?:\.\d+)?)/)?.[1];
+                return num ? `sqrt(${num})` : input;
+            }
+            return input.replace(/plus/g, '+').replace(/minus/g, '-').replace(/times/g, '*');
+        }
+
+        function calculateAI() {
+            const input = document.getElementById('aiInput').value.trim();
+            if (!input) return;
+            
+            try {
+                const parsed = parseNaturalLanguage(input);
+                const result = evaluateExpression(parsed);
+                display = result.toString();
+                history.push({ expression: input, result: display });
+                document.getElementById('aiInput').value = '';
+                updateDisplay();
+                showAISuggestion('✨ AI calculation completed!');
+            } catch (error) {
+                showAISuggestion('Could not understand that expression.');
+            }
+        }
+
+        function handleAIEnter(event) {
+            if (event.key === 'Enter') calculateAI();
+        }
+
+        // PWA Installation
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        // Hide install button if app is already installed
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+        });
+        
+        // Service Worker Registration (for offline functionality)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,Y29uc3QgQ0FDSEVfTkFNRSA9ICdhaS1jYWxjdWxhdG9yLXYxJztjb25zdCB1cmxzVG9DYWNoZSA9IFsnLyddO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignaW5zdGFsbCcsIGV2ZW50ID0+IHtldmVudC53YWl0VW50aWwoY2FjaGVzLm9wZW4oQ0FDSEVfTkFNRSkudGhlbihjYWNoZSA9PiBjYWNoZS5hZGRBbGwodXJsc1RvQ2FjaGUpKSk7fSk7c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHtldmVudC5yZXNwb25kV2l0aChjYWNoZXMubWF0Y2goZXZlbnQucmVxdWVzdCkudGhlbihyZXNwb25zZSA9PiByZXNwb25zZSB8fCBmZXRjaChldmVudC5yZXF1ZXN0KSkpO30pOw==');
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
